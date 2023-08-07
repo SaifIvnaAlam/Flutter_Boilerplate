@@ -7,6 +7,7 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutterboilerplate/initialize_app.dart';
 import 'package:get_it/get_it.dart';
 
 import 'app.dart';
@@ -17,34 +18,35 @@ import 'utils/http_client.dart';
 void main() async {
   await runZonedGuarded(
     () async {
+      await initializeApp();
       final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
       // Retain native splash screen until Dart is ready
       FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      GetIt.instance.registerLazySingleton(
-        () => HttpClient(options: BaseOptions(baseUrl: Env.serverUrl)),
-      );
-      if (!kIsWeb) {
-        if (kDebugMode) {
-          await FirebaseCrashlytics.instance
-              .setCrashlyticsCollectionEnabled(false);
-        } else {
-          await FirebaseCrashlytics.instance
-              .setCrashlyticsCollectionEnabled(true);
-        }
-      }
-      if (kDebugMode) {
-        await FirebasePerformance.instance
-            .setPerformanceCollectionEnabled(false);
-      }
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      // GetIt.instance.registerLazySingleton(
+      //   () => HttpClient(options: BaseOptions(baseUrl: "")),
+      // );
+      // if (!kIsWeb) {
+      //   if (kDebugMode) {
+      //     await FirebaseCrashlytics.instance
+      //         .setCrashlyticsCollectionEnabled(false);
+      //   } else {
+      //     await FirebaseCrashlytics.instance
+      //         .setCrashlyticsCollectionEnabled(true);
+      //   }
+      // }
+      // if (kDebugMode) {
+      //   await FirebasePerformance.instance
+      //       .setPerformanceCollectionEnabled(false);
+      // }
+      // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-      ErrorWidget.builder = (FlutterErrorDetails error) {
-        Zone.current.handleUncaughtError(error.exception, error.stack!);
-        return ErrorWidget(error.exception);
-      };
+      // ErrorWidget.builder = (FlutterErrorDetails error) {
+      //   Zone.current.handleUncaughtError(error.exception, error.stack!);
+      //   return ErrorWidget(error.exception);
+      // };
 
       runApp(const MyApp());
       FlutterNativeSplash.remove(); // Now remove splash screen
